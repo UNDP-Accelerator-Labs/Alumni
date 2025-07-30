@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UNDP Accelerator Labs Alumni: Innovation Career Impact</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-sankey/0.12.3/d3-sankey.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Proxima+Nova:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* UNDP Design System Foundation */
+      :root {
+        /* UNDP Color Palette */
+        --undp-blue: #006eb5;
+        --undp-blue-dark: #005687;
+        --undp-blue-light: #4f95dd;
+        --undp-red: #ee402d;
+        --undp-yellow: #ffd100;
+        --undp-green: #00ac4f;
+        --undp-purple: #a21942;
+        --undp-orange: #ff7e00;
+
+        /* Neutral Colors */
+        --white: #ffffff;
+        --gray-50: #fafafa;
+        --gray-100: #f5f5f5;
+        --gray-200: #eeeeee;
+        --gray-300: #e0e0e0;
+        --gray-400: #bdbdbd;
+        --gray-500: #9e9e9e;
+        --gray-600: #757575;
+        --gray-700: #616161;
+        --gray-800: #424242;
+        --gray-900: #212121;
+
+        /* Typography */
+        --font-family: "Proxima Nova", -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, sans-serif;
+
+        /* Spacing */
+        --spacing-xs: 8px;
+        --spacing-sm: 16px;
+        --spacing-md: 24px;
+        --spacing-lg: 32px;
+        --spacing-xl: 48px;
+        --spacing-2xl: 64px;
+        --spacing-3xl: 96px;
+
+        /* Container */
+        --container-max-width: 1200px;
+        --container-padding: 20px;
+
+        /* Shadows */
+        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+        --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+        --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.18);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--font-family);
+        line-height: 1.6;
+        color: var(--gray-800);
+        background: var(--white);
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Container */
+      .container {
+        max-width: var(--container-max-width);
+        margin: 0 auto;
+        padding: 0 var(--container-padding);
+      }
+
+      /* Hero Section - UNDP Style */
+      .hero {
+        background: linear-gradient(
+          135deg,
+          var(--undp-blue) 0%,
+          var(--undp-blue-dark) 100%
+        );
+        color: var(--white);
+        padding: var(--spacing-3xl) 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+        opacity: 0.3;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero-logo {
+        width: 60px;
+        height: 60px;
+        background: var(--white);
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: var(--spacing-lg);
+        box-shadow: var(--shadow-md);
+      }
+
+      .hero-logo svg {
+        width: 40px;
+        height: 26px;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 300;
+        margin-bottom: var(--spacing-md);
+        line-height: 1.1;
+      }
+
+      .hero-subtitle {
+        font-size: 1.25rem;
+        font-weight: 300;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto var(--spacing-xl);
+      }
+
+      /* Navigation */
+      .nav {
+        background: var(--white);
+        border-bottom: 1px solid var(--gray-200);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .nav-container {
+        display: flex;
+        justify-content: center;
+        padding: var(--spacing-sm) 0;
+      }
+
+      .nav a {
+        color: var(--gray-700);
+        text-decoration: none;
+        padding: var(--spacing-sm) var(--spacing-md);
+        margin: 0 var(--spacing-xs);
+        font-weight: 500;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.2s ease;
+        border-bottom: 2px solid transparent;
+      }
+
+      .nav a:hover {
+        color: var(--undp-blue);
+        border-bottom-color: var(--undp-blue);
+      }
+
+      /* Section */
+      .section {
+        padding: var(--spacing-1xl) 0;
+      }
+
+      .section-alt {
+        background: var(--gray-50);
+      }
+
+      .section-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 300;
+        color: var(--undp-blue);
+        text-align: center;
+        margin-bottom: var(--spacing-2xl);
+        line-height: 1.2;
+      }
+
+      .section-subtitle {
+        font-size: 1.125rem;
+        color: var(--gray-600);
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto var(--spacing-2xl);
+        line-height: 1.6;
+      }
+
+      /* Executive Summary Card */
+      .executive-summary {
+        background: var(--undp-blue);
+        color: var(--white);
+        border-radius: 12px;
+        padding: var(--spacing-2xl);
+        margin: var(--spacing-2xl) 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .executive-summary::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 70%
+        );
+        animation: pulse 6s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1) rotate(0deg);
+          opacity: 0.3;
+        }
+        50% {
+          transform: scale(1.1) rotate(180deg);
+          opacity: 0.6;
+        }
+      }
+
+      .executive-summary-content {
+        position: relative;
+        z-index: 2;
+      }
+
+      .executive-summary h2 {
+        font-size: 2rem;
+        font-weight: 300;
+        margin-bottom: var(--spacing-lg);
+        color: var(--white);
+      }
+
+      .executive-summary p {
+        font-size: 1.125rem;
+        margin-bottom: var(--spacing-xl);
+        opacity: 0.95;
+      }
+
+      /* Key Findings Grid - 2x2 Layout */
+      .key-findings {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-lg);
+        margin-top: var(--spacing-xl);
+      }
+
+      .finding-card {
+        background: rgba(255, 255, 255, 0.15);
+        padding: var(--spacing-lg);
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .finding-card:hover {
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.25);
+      }
+
+      .finding-card h4 {
+        color: var(--white);
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: var(--spacing-sm);
+      }
+
+      .finding-card p {
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+
+      /* Stats Grid - Proper 4-column layout */
+      .stats-section {
+        background: var(--white);
+        padding: var(--spacing-2xl) 0;
+        border-top: 1px solid var(--gray-200);
+        border-bottom: 1px solid var(--gray-200);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--spacing-lg);
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .stat-card {
+        text-align: center;
+        padding: var(--spacing-lg);
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border-top: 3px solid var(--undp-blue);
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--undp-blue);
+        display: block;
+        line-height: 1;
+        margin-bottom: var(--spacing-xs);
+      }
+
+      .stat-label {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* Foundation Stats - 2x2 Grid */
+      .foundation-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-lg);
+        max-width: 600px;
+        margin: var(--spacing-2xl) auto;
+      }
+
+      .foundation-stat-card {
+        background: var(--white);
+        padding: var(--spacing-xl);
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--undp-blue);
+      }
+
+      .foundation-stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .foundation-stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--undp-blue);
+        display: block;
+        line-height: 1;
+        margin-bottom: var(--spacing-sm);
+      }
+
+      .foundation-stat-label {
+        font-size: 1rem;
+        color: var(--gray-700);
+        font-weight: 500;
+      }
+
+      /* Sector Distribution - Better 2x2 Grid */
+      .sector-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-lg);
+        max-width: 800px;
+        margin: var(--spacing-2xl) auto;
+      }
+
+      .sector-card {
+        background: var(--white);
+        padding: var(--spacing-xl);
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .sector-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--undp-blue), var(--undp-green));
+      }
+
+      .sector-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .sector-number {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: var(--undp-blue);
+        display: block;
+        line-height: 1;
+        margin-bottom: var(--spacing-sm);
+      }
+
+      .sector-label {
+        font-size: 1.125rem;
+        color: var(--gray-700);
+        font-weight: 600;
+      }
+
+      /* Sankey Section */
+      .sankey-section {
+        background: var(--undp-blue);
+        color: var(--white);
+        padding: var(--spacing-3xl) 0;
+        text-align: center;
+      }
+
+      .sankey-container {
+        background: var(--white);
+        border-radius: 12px;
+        padding: var(--spacing-xl);
+        margin: var(--spacing-2xl) auto;
+        max-width: 1150px;
+        box-shadow: var(--shadow-xl);
+      }
+
+      .sankey-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-xl);
+      }
+
+      .sankey-stat-item {
+        text-align: center;
+        padding: var(--spacing-md);
+        background: var(--gray-50);
+        border-radius: 8px;
+        border-left: 3px solid var(--undp-blue);
+      }
+
+      .sankey-stat-number {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--undp-blue);
+        display: block;
+        line-height: 1;
+      }
+
+      .sankey-stat-label {
+        font-size: 0.75rem;
+        color: var(--gray-600);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: var(--spacing-xs);
+      }
+
+      /* Career Outcomes - 2x2 Grid */
+      .outcomes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-lg);
+        max-width: 700px;
+        margin: var(--spacing-2xl) auto;
+      }
+
+      .outcome-card {
+        background: var(--white);
+        padding: var(--spacing-xl);
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        border-top: 4px solid var(--undp-green);
+      }
+
+      .outcome-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .outcome-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--undp-green);
+        display: block;
+        line-height: 1;
+        margin-bottom: var(--spacing-sm);
+      }
+
+      .outcome-label {
+        font-size: 1rem;
+        color: var(--gray-700);
+        font-weight: 500;
+      }
+
+      /* Profile Cards */
+      .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: var(--spacing-xl);
+        margin: var(--spacing-2xl) 0;
+      }
+
+      .profile-card {
+        background: var(--white);
+        border-radius: 12px;
+        padding: var(--spacing-xl);
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        border-top: 4px solid var(--undp-blue);
+      }
+
+      .profile-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .profile-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--undp-blue);
+        margin-bottom: var(--spacing-sm);
+      }
+
+      .profile-journey {
+        color: var(--gray-600);
+        font-style: italic;
+        margin-bottom: var(--spacing-md);
+        padding: var(--spacing-sm);
+        background: var(--gray-50);
+        border-radius: 6px;
+        border-left: 3px solid var(--undp-green);
+      }
+
+      .profile-impact {
+        background: var(--gray-50);
+        padding: var(--spacing-md);
+        border-radius: 6px;
+        border-left: 3px solid var(--undp-yellow);
+        margin-top: var(--spacing-md);
+      }
+
+      /* Competency Cards - 2x2 Grid */
+      .competency-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-xl);
+        margin: var(--spacing-2xl) 0;
+      }
+
+      .competency-card {
+        background: var(--white);
+        padding: var(--spacing-xl);
+        border-radius: 12px;
+        box-shadow: var(--shadow-md);
+        border-top: 4px solid var(--undp-blue);
+        transition: all 0.3s ease;
+      }
+
+      .competency-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .competency-percentage {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--undp-blue);
+        margin-bottom: var(--spacing-md);
+      }
+
+      .competency-card h4 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: var(--spacing-md);
+      }
+
+      .competency-card ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .competency-card li {
+        padding: var(--spacing-xs) 0;
+        color: var(--gray-600);
+        position: relative;
+        padding-left: var(--spacing-md);
+      }
+
+      .competency-card li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: var(--undp-green);
+        font-weight: bold;
+      }
+
+      /* Quote Section */
+      .quote-section {
+        background: var(--gray-50);
+        padding: var(--spacing-3xl) 0;
+        text-align: center;
+      }
+
+      .quote {
+        font-size: 1.25rem;
+        font-style: italic;
+        color: var(--gray-700);
+        max-width: 700px;
+        margin: 0 auto var(--spacing-xl);
+        padding: var(--spacing-xl);
+        background: var(--white);
+        border-radius: 12px;
+        box-shadow: var(--shadow-md);
+        border-left: 4px solid var(--undp-blue);
+        position: relative;
+      }
+
+      .quote::before {
+        content: '"';
+        font-size: 3rem;
+        color: var(--undp-blue);
+        position: absolute;
+        top: var(--spacing-sm);
+        left: var(--spacing-md);
+        font-family: serif;
+        line-height: 1;
+      }
+
+      /* Conclusion Section */
+      .conclusion-section {
+        background: var(--undp-blue);
+        color: var(--white);
+        padding: var(--spacing-3xl) 0;
+      }
+
+      .success-indicators {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-lg);
+        margin: var(--spacing-2xl) 0;
+      }
+
+      .indicator-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: var(--spacing-lg);
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .indicator-card:hover {
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .indicator-card h4 {
+        color: var(--white);
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: var(--spacing-sm);
+      }
+
+      /* Footer */
+      .footer {
+        background: var(--gray-900);
+        color: var(--white);
+        text-align: center;
+        padding: var(--spacing-2xl) 0;
+      }
+
+      .footer::before {
+        content: "";
+        display: block;
+        height: 4px;
+      }
+
+      /* Visualization Styles */
+      .node rect {
+        cursor: pointer;
+        stroke: #fff;
+        stroke-width: 2px;
+        transition: all 0.3s ease;
+      }
+
+      .node rect:hover {
+        stroke-width: 3px;
+        opacity: 0.9;
+      }
+
+      .node text {
+        pointer-events: none;
+        text-shadow: 0 1px 0 #fff;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: var(--font-family);
+      }
+
+      .link {
+        fill: none;
+        stroke-opacity: 0.5;
+        transition: stroke-opacity 0.3s ease;
+      }
+
+      .link:hover {
+        stroke-opacity: 0.8;
+      }
+
+      .tooltip {
+        position: absolute;
+        background: rgba(33, 33, 33, 0.95);
+        color: white;
+        padding: var(--spacing-sm);
+        border-radius: 6px;
+        font-size: 12px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border: 1px solid var(--undp-blue);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .key-findings {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .sector-grid,
+        .foundation-stats,
+        .outcomes-grid,
+        .competency-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sankey-stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .success-indicators {
+          grid-template-columns: 1fr;
+        }
+
+        .nav-container {
+          flex-wrap: wrap;
+        }
+
+        .hero {
+          padding: var(--spacing-2xl) 0;
+        }
+
+        .section {
+          padding: var(--spacing-2xl) 0;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sankey-stats {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1>UNDP Accelerator Labs Alumni</h1>
+          <p class="hero-subtitle">A Catalyst for Innovation Careers</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="nav">
+      <div class="container">
+        <div class="nav-container">
+          <a href="#overview">Overview</a>
+          <a href="#foundation">Foundation</a>
+          <a href="#transformation">Transformation</a>
+          <a href="#profiles">Alumni Profiles</a>
+          <a href="#skills">Skills Impact</a>
+          <a href="#conclusion">Conclusion</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Executive Summary -->
+    <section id="overview" class="section">
+      <div class="container">
+        <div class="executive-summary">
+          <div class="executive-summary-content">
+            <h2>Executive Summary</h2>
+            <p>
+              The UNDP Accelerator Labs network has emerged as a powerful
+              catalyst for career transformation in the development sector,
+              creating a new generation of innovation-focused professionals who
+              are reshaping how we approach sustainable development challenges.
+            </p>
+
+            <div class="key-findings">
+              <div class="finding-card">
+                <h4>95% Innovation Retention</h4>
+                <p>
+                  Alumni continue applying innovation methodologies in their
+                  post-Labs careers with an average relevance score of 4.06/5
+                </p>
+              </div>
+              <div class="finding-card">
+                <h4>Global Mobility Impact</h4>
+                <p>
+                  28 professionals relocated internationally to join the Labs,
+                  with 60% remaining in host countries
+                </p>
+              </div>
+              <div class="finding-card">
+                <h4>Sector Diversification</h4>
+                <p>
+                  Alumni successfully transitioned across multiple sectors while
+                  maintaining innovation focus
+                </p>
+              </div>
+              <div class="finding-card">
+                <h4>Skills Conversion</h4>
+                <p>
+                  30% of professionals from non-sustainable development
+                  backgrounds converted to SD-focused roles
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-number">95</span>
+            <span class="stat-label">Alumni Analyzed</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">65</span>
+            <span class="stat-label">Countries Represented</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">4.06</span>
+            <span class="stat-label">Innovation Relevance Score</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">95.5%</span>
+            <span class="stat-label">Want Continued UNDP Engagement</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Foundation Section -->
+    <section id="foundation" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">The Foundation: Pre-Labs Career Landscape</h2>
+        <p class="section-subtitle">
+          The UNDP Accelerator Labs attracted talent from an exceptionally
+          diverse range of sectors, creating a rich tapestry of experience and
+          expertise that became one of the network's greatest strengths.
+        </p>
+
+        <div class="sector-grid">
+          <div class="sector-card">
+            <span class="sector-number">21</span>
+            <span class="sector-label">From Academia & Research</span>
+          </div>
+          <div class="sector-card">
+            <span class="sector-number">23</span>
+            <span class="sector-label">From Civil Society & NGOs</span>
+          </div>
+          <div class="sector-card">
+            <span class="sector-number">21</span>
+            <span class="sector-label">From Private Sector</span>
+          </div>
+          <div class="sector-card">
+            <span class="sector-number">28</span>
+            <span class="sector-label">From UN System</span>
+          </div>
+        </div>
+
+        <h3
+          style="
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--undp-blue);
+            text-align: center;
+            margin: var(--spacing-3xl) 0 var(--spacing-lg) 0;
+          "
+        >
+          Geographic Mobility: A Commitment to Global Impact
+        </h3>
+        <p class="section-subtitle">
+          One of the most striking aspects was the international mobility
+          demonstrated by incoming alumni.
+          <strong style="color: var(--undp-blue)"
+            >28 professionals relocated internationally</strong
+          >
+          to take on their Labs positions, demonstrating remarkable commitment
+          to the innovation mandate.
+        </p>
+
+        <div class="foundation-stats">
+          <div class="foundation-stat-card">
+            <span class="foundation-stat-number">28</span>
+            <span class="foundation-stat-label">International Relocations</span>
+          </div>
+          <div class="foundation-stat-card">
+            <span class="foundation-stat-number">60%</span>
+            <span class="foundation-stat-label"
+              >Remained in Host Countries</span
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Transformation Section with Sankey -->
+    <section id="transformation" class="sankey-section">
+      <div class="container">
+        <h2
+          style="
+            color: white;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 300;
+            margin-bottom: var(--spacing-lg);
+          "
+        >
+          The Transformation: Career Evolution Visualization
+        </h2>
+        <p
+          style="
+            font-size: 1.125rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto var(--spacing-2xl);
+          "
+        >
+          The following interactive diagram illustrates the career flows of 95
+          Accelerator Labs alumni, showing their remarkable career evolution and
+          diverse pathways while maintaining innovation focus.
+        </p>
+      </div>
+
+      <div class="sankey-container">
+        <div class="sankey-stats">
+          <div class="sankey-stat-item">
+            <span class="sankey-stat-number">95</span>
+            <span class="sankey-stat-label">Total Alumni</span>
+          </div>
+          <div class="sankey-stat-item">
+            <span class="sankey-stat-number">8</span>
+            <span class="sankey-stat-label">Source Sectors</span>
+          </div>
+          <div class="sankey-stat-item">
+            <span class="sankey-stat-number">10</span>
+            <span class="sankey-stat-label">Destination Sectors</span>
+          </div>
+          <div class="sankey-stat-item">
+            <span class="sankey-stat-number">18</span>
+            <span class="sankey-stat-label">To UNDP Roles</span>
+          </div>
+        </div>
+
+        <svg id="sankeyChart" width="1100" height="600"></svg>
+      </div>
+
+      <div class="container">
+        <h3
+          style="
+            color: white;
+            font-size: 2rem;
+            font-weight: 300;
+            text-align: center;
+            margin: var(--spacing-2xl) 0 var(--spacing-lg) 0;
+          "
+        >
+          Remarkable Career Outcomes
+        </h3>
+        <div class="outcomes-grid">
+          <div class="outcome-card">
+            <span class="outcome-number">55.1%</span>
+            <span class="outcome-label">External Transitions</span>
+          </div>
+          <div class="outcome-card">
+            <span class="outcome-number">24.7%</span>
+            <span class="outcome-label">Internal UNDP Advancement</span>
+          </div>
+          <div class="outcome-card">
+            <span class="outcome-number">26</span>
+            <span class="outcome-label">To Private Sector Leadership</span>
+          </div>
+          <div class="outcome-card">
+            <span class="outcome-number">11</span>
+            <span class="outcome-label">To Academic Excellence</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Alumni Profiles -->
+    <section id="profiles" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title">
+          Alumni Spotlight: Innovation Leaders in Action
+        </h2>
+
+        <div class="profile-grid">
+          <div class="profile-card">
+            <div class="profile-name">Matias Acosta</div>
+            <div class="profile-journey">
+              Cambridge University Researcher → Argentina AccLab → Cosysense
+              Co-founder
+            </div>
+            <p>
+              Matias exemplifies the Labs' power to transform academic
+              excellence into entrepreneurial impact. His research background,
+              combined with Labs methodologies, enabled him to co-found
+              Cosysense, a cleantech startup focused on AI-driven energy
+              efficiency.
+            </p>
+            <div class="profile-impact">
+              <strong>Innovation Impact:</strong> "Quote."
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <div class="profile-name">Viviana Angulo</div>
+            <div class="profile-journey">
+              World Business Angels → Bolivia AccLab → PISTA8 Principal
+              Co-founder
+            </div>
+            <p>
+              Viviana leveraged her experience in innovation financing and Labs
+              methodologies to create Bolivia's first corporate-backed business
+              accelerator, representing the multiplication effect of Labs
+              training.
+            </p>
+            <div class="profile-impact">
+              <strong>Innovation Impact:</strong> "Quote."
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <div class="profile-name">Diego Suarez</div>
+            <div class="profile-journey">
+              Universidad Católica Boliviana → Bolivia AccLab → UNDP Regional
+              Strategic Innovation Specialist
+            </div>
+            <p>
+              Diego's trajectory shows the Labs' role in developing internal
+              UNDP innovation capacity. His academic foundation, combined with
+              country-level Labs experience, positioned him perfectly for
+              regional strategy roles.
+            </p>
+            <div class="profile-impact">
+              <strong>Innovation Impact:</strong> "Quote"
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <div class="profile-name">Tshoki Zangmo</div>
+            <div class="profile-journey">
+              Centre for Bhutan and GNH Studies → Bhutan AccLab → Oxford Poverty
+              & Human Development Initiative
+            </div>
+            <p>
+              Tshoki's transition represents the Labs' power to bridge
+              government experience with academic rigor. Her work at Oxford's
+              OPHI continues advancing evidence-based approaches to development.
+            </p>
+            <div class="profile-impact">
+              <strong>Innovation Impact:</strong> "Quote."
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <div class="profile-name">Yerassyl Kalikhan</div>
+            <div class="profile-journey">
+              EY Kazakhstan → Kazakhstan AccLab → Meta Regional Public Policy
+              Manager
+            </div>
+            <p>
+              Yerassyl's career shows how Labs experience translates into
+              high-impact roles in global technology companies. His combination
+              of consulting skills and Labs innovation methodologies made him
+              valuable for navigating complex policy landscapes.
+            </p>
+            <div class="profile-impact">
+              <strong>Innovation Impact:</strong> "Quote."
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Impact Section -->
+    <section id="skills" class="section">
+      <div class="container">
+        <h2 class="section-title">
+          The Innovation Dividend: Skills and Capabilities Developed
+        </h2>
+
+        <div class="competency-grid">
+          <div class="competency-card">
+            <div class="competency-percentage">65%</div>
+            <h4>Innovation Methodology Mastery</h4>
+            <ul>
+              <li>Design thinking and human-centered design</li>
+              <li>Systems thinking and complexity navigation</li>
+              <li>Strategic foresight and horizon scanning</li>
+              <li>Prototyping and experimentation methodologies</li>
+            </ul>
+          </div>
+
+          <div class="competency-card">
+            <div class="competency-percentage">55%</div>
+            <h4>Adaptive Mindsets and Resilience</h4>
+            <ul>
+              <li>Embracing ambiguity and uncertainty</li>
+              <li>Courage to fail and learn from setbacks</li>
+              <li>Collaborative leadership across stakeholders</li>
+              <li>Curiosity-driven problem-solving</li>
+            </ul>
+          </div>
+
+          <div class="competency-card">
+            <div class="competency-percentage">40%</div>
+            <h4>Systems-Level Awareness</h4>
+            <ul>
+              <li>Understanding bureaucratic dynamics</li>
+              <li>Political economy analysis and navigation</li>
+              <li>Stakeholder mapping and engagement</li>
+              <li>Change management in complex organizations</li>
+            </ul>
+          </div>
+
+          <div class="competency-card">
+            <div class="competency-percentage">30%</div>
+            <h4>Network Building & Partnerships</h4>
+            <ul>
+              <li>Cross-sector collaboration skills</li>
+              <li>Community engagement and co-creation</li>
+              <li>Digital networking and knowledge sharing</li>
+              <li>Strategic partnership development</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quotes Section -->
+    <section class="quote-section">
+      <div class="container">
+        <div class="quote">
+          "I now see that within every challenge lies the seed of innovation;
+          you just have to approach it with an open mind."
+        </div>
+        <div class="quote">
+          "Co-creation is not a method; it's a philosophy that has transformed
+          how I approach every professional challenge."
+        </div>
+        <div class="quote">
+          "The Labs taught me that innovation can serve people and planet - this
+          became my career North Star."
+        </div>
+      </div>
+    </section>
+
+    <!-- Conclusion -->
+    <section id="conclusion" class="conclusion-section">
+      <div class="container">
+        <h2
+          style="
+            color: white;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 300;
+            margin-bottom: var(--spacing-lg);
+            text-align: center;
+          "
+        >
+          The Accelerator Labs as Career Catalyst
+        </h2>
+        <p
+          style="
+            font-size: 1.125rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto var(--spacing-2xl);
+            text-align: center;
+          "
+        >
+          The UNDP Accelerator Labs network has proven to be far more than an
+          innovation initiative - it has become a transformative career
+          development platform that is reshaping the development sector's
+          approach to talent and innovation.
+        </p>
+
+        <h3
+          style="
+            color: white;
+            font-size: 2rem;
+            font-weight: 300;
+            text-align: center;
+            margin: var(--spacing-2xl) 0 var(--spacing-lg) 0;
+          "
+        >
+          Key Success Indicators
+        </h3>
+        <div class="success-indicators">
+          <div class="indicator-card">
+            <h4>Innovation Skills Transfer</h4>
+            <p>
+              4.06/5 average relevance score demonstrates successful capability
+              building
+            </p>
+          </div>
+          <div class="indicator-card">
+            <h4>Career Acceleration</h4>
+            <p>
+              Alumni transitioned to senior roles across sectors while
+              maintaining innovation focus
+            </p>
+          </div>
+          <div class="indicator-card">
+            <h4>Global Impact Multiplication</h4>
+            <p>
+              International mobility created local capacity while alumni
+              influence multiple countries
+            </p>
+          </div>
+          <div class="indicator-card">
+            <h4>Sector Transformation</h4>
+            <p>
+              30% conversion rate from non-SD to SD-focused roles shows
+              effective talent development
+            </p>
+          </div>
+          <div class="indicator-card">
+            <h4>Network Effects</h4>
+            <p>
+              95.5% continued engagement interest creates lasting institutional
+              value
+            </p>
+          </div>
+          <div class="indicator-card">
+            <h4>Internal Capacity Building</h4>
+            <p>
+              24.7% internal advancement rate strengthens UNDP's innovation
+              capabilities
+            </p>
+          </div>
+        </div>
+
+        <h3
+          style="
+            color: white;
+            font-size: 2rem;
+            font-weight: 300;
+            text-align: center;
+            margin: var(--spacing-2xl) 0 var(--spacing-lg) 0;
+          "
+        >
+          Strategic Impact
+        </h3>
+        <p
+          style="
+            font-size: 1.125rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+          "
+        >
+          As we look toward achieving the Sustainable Development Goals, the
+          Labs alumni represent a critical asset: a global network of
+          innovation-enabled professionals positioned throughout the development
+          ecosystem, equipped with the skills, mindsets, and connections needed
+          to accelerate progress toward a more sustainable and equitable world.
+        </p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <p>&copy; 2025 UNDP Accelerator Labs Alumni Impact Report</p>
+        <p>
+          Analysis based on 95 alumni across 65 countries | Data collection:
+          June 2025
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Process the real data
+      const transitions = {
+        "UN -> UN": 3,
+        "NGO -> NGO": 4,
+        "IFI -> Self-Employed": 1,
+        "UN -> UNDP": 5, // Combined "UN -> UNDP" (4) + "UN -> UNDP  " (1)
+        "Private Sector -> Private Sector": 9,
+        "Government -> Academia": 2,
+        "International Organization -> Private Sector": 2,
+        "Academia -> UNDP": 2,
+        "UN -> Self-Employed": 1,
+        "UN -> N/A": 4,
+        "NGO -> Government": 1,
+        "Academia -> Academia": 3,
+        "International Organization -> UNDP": 1,
+        "UN -> NGO": 1,
+        "NGO -> UNDP": 4,
+        "UN -> Private Sector": 1,
+        "Government -> N/A": 2,
+        "UNDP -> Self-Employed": 2,
+        "UNDP -> UNDP": 1,
+        "NGO -> N/A": 5,
+        "Private Sector -> UNDP": 8,
+        "Academia -> Government": 2,
+        "Government -> UNDP": 3,
+        "Academia -> UN": 1,
+        "UN -> Academia": 1,
+        "UNDP -> Private Sector": 1,
+        "NGO -> Private Sector": 1,
+        "NGO -> Self-Employed": 1,
+        "Private Sector -> N/A": 3,
+        "Private Sector -> UN": 3,
+        "UNDP -> IFI": 2,
+        "NGO -> Academia": 2,
+        "NGO -> IFI": 1,
+        "Academia -> N/A": 2,
+        "Government -> Private Sector": 1,
+        "Academia -> Private Sector": 1,
+        "UN -> International Organization": 1,
+        "Government -> Government": 1,
+        "Private Sector -> Government": 1,
+        "UNDP -> UN": 1,
+        "Academia -> NGO": 1,
+        "International Organization -> UN": 1,
+        "International Organization -> IFI": 1,
+        "International Organization -> N/A": 1,
+      };
+
+      // Create unique sectors
+      const fromSectors = [
+        "UN",
+        "NGO",
+        "IFI",
+        "Private Sector",
+        "Government",
+        "International Organization",
+        "Academia",
+        "UNDP",
+      ];
+      const toSectors = [
+        "UN",
+        "NGO",
+        "Self-Employed",
+        "UNDP",
+        "Private Sector",
+        "Academia",
+        "N/A",
+        "Government",
+        "IFI",
+        "International Organization",
+      ];
+
+      // Create nodes
+      const nodes = [];
+      const nodeMap = new Map();
+
+      // Add source nodes
+      fromSectors.forEach((sector, i) => {
+        const node = {
+          id: i,
+          name: sector + "\n(Before)",
+          group: "source",
+          originalName: sector,
+        };
+        nodes.push(node);
+        nodeMap.set(sector + "_source", i);
+      });
+
+      // Add target nodes
+      toSectors.forEach((sector, i) => {
+        const nodeId = fromSectors.length + i;
+        const node = {
+          id: nodeId,
+          name: sector + "\n(After)",
+          group: "target",
+          originalName: sector,
+        };
+        nodes.push(node);
+        nodeMap.set(sector + "_target", nodeId);
+      });
+
+      // Create links
+      const links = [];
+      Object.entries(transitions).forEach(([key, value]) => {
+        const [from, to] = key.split(" -> ");
+        const sourceId = nodeMap.get(from + "_source");
+        const targetId = nodeMap.get(to + "_target");
+
+        if (sourceId !== undefined && targetId !== undefined) {
+          links.push({
+            source: sourceId,
+            target: targetId,
+            value: value,
+          });
+        }
+      });
+
+      // Set up the SVG
+      const svg = d3.select("#sankeyChart");
+      const width = +svg.attr("width");
+      const height = +svg.attr("height");
+
+      // Create the Sankey generator
+      const sankey = d3
+        .sankey()
+        .nodeWidth(15)
+        .nodePadding(10)
+        .extent([
+          [50, 50],
+          [width - 50, height - 50],
+        ]);
+
+      // Generate the Sankey layout
+      const { nodes: sankeyNodes, links: sankeyLinks } = sankey({
+        nodes: nodes.map((d) => Object.assign({}, d)),
+        links: links.map((d) => Object.assign({}, d)),
+      });
+
+      // Color scale for sectors
+      const colorScale = d3
+        .scaleOrdinal()
+        .domain(fromSectors.concat(toSectors))
+        .range([
+          "#006EB5",
+          "#00AC4F",
+          "#FFD100",
+          "#EE402D",
+          "#A21942",
+          "#FF7E00",
+          "#424242",
+          "#757575",
+          "#9E9E9E",
+          "#BDBDBD",
+        ]);
+
+      // Add links
+      svg
+        .append("g")
+        .selectAll("path")
+        .data(sankeyLinks)
+        .join("path")
+        .attr("class", "link")
+        .attr("d", d3.sankeyLinkHorizontal())
+        .attr("stroke", (d) =>
+          colorScale(sankeyNodes[d.source.index].originalName)
+        )
+        .attr("stroke-width", (d) => Math.max(1, d.width))
+        .style("mix-blend-mode", "multiply")
+        .on("mouseover", function (event, d) {
+          d3.select(this).style("stroke-opacity", 0.8);
+
+          const tooltip = d3
+            .select("body")
+            .append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+          tooltip
+            .html(
+              `${d.source.originalName} → ${d.target.originalName}<br>Candidates: ${d.value}`
+            )
+            .style("left", event.pageX + 10 + "px")
+            .style("top", event.pageY - 10 + "px")
+            .transition()
+            .duration(200)
+            .style("opacity", 1);
+        })
+        .on("mouseout", function () {
+          d3.select(this).style("stroke-opacity", 0.5);
+          d3.selectAll(".tooltip").remove();
+        });
+
+      // Add nodes
+      const node = svg
+        .append("g")
+        .selectAll("g")
+        .data(sankeyNodes)
+        .join("g")
+        .attr("class", "node");
+
+      node
+        .append("rect")
+        .attr("x", (d) => d.x0)
+        .attr("y", (d) => d.y0)
+        .attr("height", (d) => d.y1 - d.y0)
+        .attr("width", (d) => d.x1 - d.x0)
+        .attr("fill", (d) => colorScale(d.originalName))
+        .attr("rx", 3)
+        .attr("ry", 3);
+
+      // Add node labels
+      node
+        .append("text")
+        .attr("x", (d) => (d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6))
+        .attr("y", (d) => (d.y1 + d.y0) / 2)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", (d) => (d.x0 < width / 2 ? "start" : "end"))
+        .text((d) => d.name)
+        .style("font-size", "12px")
+        .style("font-weight", "600")
+        .style("fill", "#424242");
+
+      // Add value labels on larger nodes
+      node
+        .append("text")
+        .attr("x", (d) => (d.x0 + d.x1) / 2)
+        .attr("y", (d) => (d.y1 + d.y0) / 2)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "middle")
+        .text((d) => (d.value > 2 ? d.value : ""))
+        .style("font-size", "11px")
+        .style("font-weight", "bold")
+        .style("fill", "white")
+        .style("text-shadow", "1px 1px 2px rgba(0,0,0,0.5)");
+
+      // Add animation
+      svg
+        .selectAll(".link")
+        .style("opacity", 0)
+        .transition()
+        .duration(1500)
+        .delay((d, i) => i * 50)
+        .style("opacity", 1);
+
+      node
+        .selectAll("rect")
+        .style("opacity", 0)
+        .transition()
+        .duration(1000)
+        .delay(800)
+        .style("opacity", 1);
+
+      node
+        .selectAll("text")
+        .style("opacity", 0)
+        .transition()
+        .duration(1000)
+        .delay(1200)
+        .style("opacity", 1);
+    </script>
+  </body>
+</html>
