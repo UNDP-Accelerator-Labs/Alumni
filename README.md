@@ -2,7 +2,7 @@
 
 A comprehensive data visualization website showcasing the career transformation and impact of UNDP Accelerator Labs alumni across 65 countries.
 
-![UNDP Alumni Website]()
+[UNDP Accelerator Lab Alumni Website](https://undp-accelerator-labs.github.io/Alumni/)
 
 ## 🌟 Overview
 
@@ -28,7 +28,7 @@ This website presents a comprehensive analysis of 95 UNDP Accelerator Labs alumn
 
 ## 🚀 Live Demo
 
-Visit the live website: [UNDP Alumni Impact Report](https://your-username.github.io/undp-alumni-website)
+Visit the live website: [UNDP Alumni Impact Report]([https://undp-accelerator-labs.github.io/Alumni/](https://undp-accelerator-labs.github.io/Alumni/))
 
 ## 🛠️ Technology Stack
 
