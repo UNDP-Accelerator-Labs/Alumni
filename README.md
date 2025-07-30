@@ -42,7 +42,7 @@ Visit the live website: [UNDP Alumni Impact Report]([https://undp-accelerator-la
 ## 📁 Project Structure
 
 ```
-undp-alumni-website/
+alumni-website/
 ├── index.html              # Main website file
 ├── README.md               # Project documentation
 ├── LICENSE                 # MIT License
